@@ -1,0 +1,31 @@
+.Total {
+  width: 100%;
+  height: 100%;
+}
+.top-total {
+  height: 25%;
+}
+.header-total {
+  font-weight: 450;
+  font-size: 20px;
+  text-transform: uppercase;
+}
+.span-total {
+  margin-top: 20px;
+  font-size: 30px;
+  font-weight: 500;
+}
+
+.span-avg {
+  font-weight: normal;
+  font-size: 16px;
+  color: green;
+}
+
+.bottom-total {
+  width: 100%;
+  height: 75%;
+}
+.width-total {
+  width: 400px !important;
+}

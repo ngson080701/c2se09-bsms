@@ -1,0 +1,10 @@
+.Items{
+    padding: 10px 0px 0px 0px ;
+    text-align: left;
+    justify-content: center;
+    color: black;
+    font-size: 18px;
+    font-weight: 500;   
+
+    color: var(--color-header);
+}
