@@ -1,0 +1,95 @@
+.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  width: 100vw;
+  padding: 4px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100vh;
+  transition: all;
+  background-color: #02020246;
+}
+
+.modal-container.closed {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.modal-container.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-container.dark {
+  background-color: #ffffff46;
+}
+
+.modal-content {
+  position: relative;
+  z-index: 100;
+  width: 40%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 100%;
+  max-height: 100%;
+}
+.custom-container {
+  position: relative;
+  background-color: #fff;
+  border-radius: 12px;
+  /* Định nghĩa hiệu ứng bóng */
+  /* Định nghĩa nền tối khi có class "dark" */
+}
+.custom-button {
+  position: absolute;
+  top: 3px;
+  right: 2.5px;
+  color: #888;
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-button:hover {
+  background-color: #eee;
+  color: #333;
+}
+
+.custom-button.dark:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+.custom-svg {
+  width: 18px;
+  height: 18px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: polygon(0 0, 0 0, 0 0);
+  white-space: nowrap;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+.modal-content-ty {
+  padding: 6px 24px;
+}
+.item-content-span {
+  display: flex;
+  justify-content: space-between;
+}
