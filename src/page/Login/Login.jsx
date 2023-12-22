@@ -5,7 +5,7 @@ import {
   AiFillEye,
   AiFillEyeInvisible,
 } from "react-icons/ai";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthContext } from "../../context/AuthContext";
@@ -15,6 +15,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 const SITE_KEY = "6Lc7fhAjAAAAAGx42AoXHeM-zx_wONWme7aRc0xn";
 
 export default function Login() {
+  const navigate = useNavigate();
   // check show password text
   const [pass, setPass] = useState(false);
   // re captcha
@@ -74,17 +75,19 @@ export default function Login() {
       formValid = false;
       setErrField((prevState) => ({
         ...prevState,
-        EmailErr: "Please enter email",
+        EmailErr: "Please enter email/sms",
       }));
-    } else {
-      if (!inputField.Email.match(validEmail)) {
-        formValid = false;
-        setErrField((prevState) => ({
-          ...prevState,
-          EmailErr: "You have entered an invalid email address! ",
-        }));
-      }
     }
+    // else {
+    //
+    //   if (!inputField.Email.match(validEmail)) {
+    //     formValid = false;
+    //     setErrField((prevState) => ({
+    //       ...prevState,
+    //       EmailErr: "You have entered an invalid email address! ",
+    //     }));
+    //   }
+    // }
     if (inputField.Password === "") {
       formValid = false;
       setErrField((prevState) => ({
@@ -119,6 +122,7 @@ export default function Login() {
         Password: inputField.Password,
         token: recaptchaValue,
       };
+      localStorage.setItem('is_verified_otp', 'false');
       try {
         const response = await axios.post(
           "http://localhost:8800/api/auth/login_customer",
@@ -140,13 +144,20 @@ export default function Login() {
             }));
             resetForm();
           } else {
-            if (response.data.status === 200) {
-              toast.success(response.data.message);
-              dispatch({
-                type: "LOGIN_SUCCESS",
-                payload: response.data.value,
-              });
+            localStorage.setItem('username', inputField.Email);
+            if (!response?.data?.value?.IsVerified) {
+              await toast.success('Please Register Verify OTP');
+              navigate("/register-otp");
+              return;
             }
+
+            dispatch({
+              type: "LOGIN_SUCCESS",
+              payload: response.data.value,
+            });
+
+            await toast.success('Verify OTP');
+            navigate(`/otp-verification`);
           }
         }
       } catch (err) {
@@ -174,7 +185,7 @@ export default function Login() {
               onChange={InputHandler}
               autoComplete="off"
             />
-            <label>Email</label>
+            <label>Telephone</label>
           </div>
           {errField.EmailErr.length > 0 && (
             <span className="error">{errField.EmailErr} </span>

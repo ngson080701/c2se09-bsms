@@ -36,7 +36,7 @@ export default function Home() {
       <div className="about-container">
         <div className="div-image">
           <img
-            src="https://i.pinimg.com/474x/fa/ba/7a/faba7adb260e42bd636b45af39c92edd.jpg"
+            src="https://cdn.jamja.vn/blog/wp-content/uploads/2019/02/dong-tay-barbershop-1.jpg"
             alt=""
             className="image-about"
           />
@@ -48,11 +48,7 @@ export default function Home() {
               A SMOOTH BARBER EXPERIENCE IN YOUR TOWN
             </h2>
             <p>
-              Far far away, behind the word mountains, far from the countries
-              Vokalia and Consonantia, there live the blind texts. Separated
-              they live in Bookmarksgrove right at the coast of the Semantics, a
-              large language ocean. A small river named Duden flows by their
-              place and supplies it with the necessary regelialia.
+              "Welcome to our convenient haircut booking system! Easily choose and book with quality hairdressers and locations. Enjoy a unique experience, save time and always ensure We guarantee you will have professional hair care services tailored to your personal needs. Experience it now to have beautiful and a comfortable beauty session!"
             </p>
           </div>
         </div>
@@ -82,16 +78,7 @@ export default function Home() {
         <Telephone />
       </div>
       <Scroll />
-      {/* <div className="video">
-        <ReactPlayer
-          url="https://youtu.be/r9lvNDkQhd4"
-          playing={true}
-          volume={1}
-          width="100%"
-          height="100%"
-          onReady={() => console.log("ready now")}
-        />
-      </div> */}
+      
       <Footer />
     </div>
   );

@@ -40,9 +40,10 @@ export default function SingleService() {
     };
     fetchLimit();
   }, []);
-
+  
   return (
     <div className="container">
+      
       <section className="section1">
         <div className="background-image">
           <div className="container-item">
@@ -60,7 +61,7 @@ export default function SingleService() {
           <div className="item-content">
             <div className="header-service">Services</div>
             <div className="item-name-single">{data.Name_Service}</div>
-            <div className="item-price-single">{data.Price} $</div>
+            <div className="item-price-single">{data.Price} VND</div>
             <div className="item-desc-single">{data.Description}</div>
             <span>
               Scroll down below to book now with us <AiOutlineArrowDown />
@@ -68,12 +69,13 @@ export default function SingleService() {
           </div>
         </div>
         <div className="single-right">
-          <div className="header-limit">other service</div>
+          <div className="header-limit">Other service</div>
           {dataLimit.map((limit, i) => {
             return (
               <div className="item-limit-single" key={i}>
                 <img src={limit.Image} alt="" className="image-limit" />
-                <Link
+                <Link 
+                  
                   to={`/services/${limit.Name_Service}`}
                   className="link-single"
                 >
@@ -84,12 +86,19 @@ export default function SingleService() {
           })}
         </div>
       </div>
-
+      
       <div className="telephone">
         <Telephone />
       </div>
       <Scroll />
+      
       <Footer />
+      
     </div>
+    
+    
   );
+
+
 }
+

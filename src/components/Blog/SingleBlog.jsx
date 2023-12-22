@@ -17,6 +17,7 @@ export default function SingleBlog() {
   const [user, setUser] = useState(currentUser);
   const [data, setData] = useState([]);
   const [services, setServices] = useState([]);
+  const [category, setCategory] = useState([]);
   const { id } = useParams();
   const [single, setSingle] = useState("");
   const [comment, setComment] = useState([]);
@@ -38,6 +39,12 @@ export default function SingleBlog() {
       setServices(res.data.value);
     };
     fetchService();
+    
+    const fetchCategory = async () => {
+      const res = await axios.get("http://localhost:8800/api/category/all");
+      setCategory(res.data.value);
+    };
+    fetchCategory();
   }, []);
   // fetch single
   useEffect(() => {
@@ -317,9 +324,9 @@ export default function SingleBlog() {
           {/* list service */}
           <div className="list-service-blog">
             <h3 className="title-blog"> Services</h3>
-            {services.map((value, u) => (
+            {category.map((value, u) => (
               <div className="service-blog" key={u}>
-                <span>{value.Name_Service}</span>
+                <span>{value.Title}</span>
               </div>
             ))}
           </div>

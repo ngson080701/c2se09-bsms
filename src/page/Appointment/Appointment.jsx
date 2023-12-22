@@ -13,6 +13,7 @@ import { MdContentCut } from "react-icons/md";
 import moment from "moment";
 import Scroll from "../../components/ScrollToTop/Scroll";
 import ModalBooking from "../../components/ModalBooking/ModalBooking";
+import {isEmpty} from "../../utils";
 
 export default function Appointment() {
   const { user: currentUser } = useContext(AuthContext);
@@ -24,7 +25,7 @@ export default function Appointment() {
   const [service, setService] = useState([]);
   const [slotArray, setSlotArray] = useState([]);
   const [date, setDate] = useState(moment().format("yyyy-MM-DD"));
-  const [openStore, setOpenStore] = useState(false);
+  const [openStore, setOpenStore] = useState(true);
   const [openService, setOpenService] = useState(false);
   const [nameService, setNameService] = useState("");
   const [price, setPrice] = useState("");
@@ -64,12 +65,21 @@ export default function Appointment() {
               staffId: storeId,
             }
           );
-          setStaff(res.data);
+          const resStaffs  = res.data;
+          setStaff(resStaffs);
+          if (!isEmpty(resStaffs[0])) {
+            setStaffName(resStaffs[0]?.Name);
+            setStaffId(resStaffs[0]?._id);
+          }
         } catch (error) {
           console.log(error);
         }
       };
       fetchStaff();
+
+      setStep2(true);
+
+      // setStaffId(user._id);
     }
   }, [storeId]);
   useEffect(() => {
@@ -109,8 +119,10 @@ export default function Appointment() {
     const newDate = moment(new Date(e.target.value)).format("YYYY-MM-DD");
     setDate(newDate);
     setStep3(true);
+    setStep4(true);
     const data = {
-      staffId: staffId,
+      storeId: storeId,
+      userId: user._id,
       date: newDate,
     };
 
@@ -120,16 +132,26 @@ export default function Appointment() {
         data
       );
       console.log(res.data);
-      setSlotArray(res.data.slots);
+      setSlotArray(res.data);
       setDateId(res.data._id);
     } catch (error) {}
   };
   const history = useNavigate();
   // console.log(nameService);
   const submitBooking = async () => {
+    if (isEmpty(slotText)) {
+      toast.error('Select slot time');
+      return;
+    }
+
+    if (isEmpty(idService)) {
+      toast.error('Select Service');
+      return;
+    }
+
     const data = {
       StaffId: staffId,
-      DateId: dateId,
+      // DateId: dateId,
       SlotId: slotId,
       CustomerId: user._id,
       NameCustomer: user.Name_Customer,
@@ -137,24 +159,32 @@ export default function Appointment() {
       Email: user.Email,
       Services: idService,
       storeId: storeId,
-      
+      date: date,
+      slotTime: slotText,
+      Staff_Name: staffName,
     };
-  
-    setBooking(data);
-    setModalOpen(true);
-    // try {
-    //   const res = await axios.post(
-    //     "http://localhost:8800/api/appointment/add",
-    //     data
-    //   );
 
-    //   toast.success("Appointment successfully!!");
-    //   setTimeout(() => {
-    //     history("/home");
-    //   }, 3000);
-    // } catch (error) {
-    //   toast.error("Appointment failed");
-    // }
+    setBooking(data);
+    try {
+      const res = await axios.post(
+        "http://localhost:8800/api/appointment/add",
+        data
+      );
+
+      setModalOpen(true);
+      toast.success("Appointment successfully!!");
+      setTimeout(() => {
+        history("/home");
+      }, 3000);
+    } catch (error) {
+      const messageError = error?.response?.data?.error;
+      if (!isEmpty(messageError)) {
+        toast.error(messageError);
+        return;
+      }
+
+      toast.error("Appointment failed");
+    }
   };
 
   return (
@@ -199,6 +229,7 @@ export default function Appointment() {
                   <div className="grid-service">
                     {store.map((store, i) => (
                       <div key={i} className="items-service-booking">
+                        <img className="img-Store" src={store.Image}  />
                         <span> {store.Name_Store}</span>
                         <span> {store.City}</span>
                         <span className="desc-booking">
@@ -255,7 +286,7 @@ export default function Appointment() {
                             className="img-booking"
                           />
                           <span> {services.Name_Service}</span>
-                          <span> {services.Price}</span>
+                          <span> {services.Price}VND</span>
                           <span className="desc-booking">
                             {services.Description}
                           </span>
@@ -307,7 +338,7 @@ export default function Appointment() {
                     <IoMdArrowDropright />
                   </span>
                 </div>
-                <span className="title-booking"> 3.Choose Date </span>
+                <span className="title-booking"> 2.Choose Date </span>
                 <div className="item-booking">
                   <span className="icon-booking">
                     <BsPersonFill />
@@ -343,14 +374,14 @@ export default function Appointment() {
                     </span>
                     <div className="grid-slot">
                       {slotArray?.map((slot, index) => {
-                        const Time = new Date(date + "T" + slot.Time);
-                        if (Time < currentTime) {
-                          return (
-                            <button key={index} className="item-false">
-                              {slot.Time}
-                            </button>
-                          );
-                        }
+                        // const Time = new Date(date + "T" + slot.Time);
+                        // if (Time < currentTime) {
+                        //   return (
+                        //     <button key={index} className="item-false">
+                        //       {slot.Time}
+                        //     </button>
+                        //   );
+                        // }
                         if (slot.isBooked === true) {
                           return (
                             <button key={index} className="item-false">
@@ -379,7 +410,7 @@ export default function Appointment() {
                     </div>
                   </React.Fragment>
                 ) : null}
-                {step4 ? (
+                {/*{step4 ? (
                   <React.Fragment>
                     <button
                       className="submit-booking true"
@@ -393,7 +424,11 @@ export default function Appointment() {
                   <React.Fragment>
                     <button className="submit-booking false"> Complete</button>
                   </React.Fragment>
-                )}
+                )}*/}
+
+                <React.Fragment>
+                  <button onClick={submitBooking} className="submit-booking false"> Complete</button>
+                </React.Fragment>
               </div>
             </div>
           )}

@@ -88,7 +88,7 @@ export default function Contact() {
                 <div className="contact-text">
                   <p>
                     <b>Phone: </b>
-                    0987654321
+                    09898989898 
                   </p>
                 </div>
               </div>
@@ -101,7 +101,7 @@ export default function Contact() {
                 <div className="contact-text">
                   <p>
                     <b>Email: </b>
-                    bookingbarber.ad@gmail.com
+                    C2SE09@gmail.com
                   </p>
                 </div>
               </div>
@@ -113,7 +113,7 @@ export default function Contact() {
                 </div>
                 <div className="contact-text">
                   <p>
-                    <b>Website:</b>
+                    <b>Website: BARBERSHOP.C2SE09</b>
                     
                   </p>
                 </div>

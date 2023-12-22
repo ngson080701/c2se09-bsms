@@ -41,7 +41,7 @@ export default function About() {
       <div className="about-container">
         <div className="div-image">
           <img
-            src="https://i.pinimg.com/474x/fa/ba/7a/faba7adb260e42bd636b45af39c92edd.jpg"
+            src="https://kenh14cdn.com/thumb_w/660/2017/image015-1500986315094.jpg"
             alt=""
             className="image-about"
           />

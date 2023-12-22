@@ -4,6 +4,7 @@ import { AuthContext } from "./../../context/AuthContext";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {isEmpty, validEmail} from "../../utils";
 
 export default function Information() {
   const { user: currentUser } = useContext(AuthContext);
@@ -80,16 +81,22 @@ export default function Information() {
   // update information
   const submitHandler = async (e) => {
     e.preventDefault();
+    if (!isEmpty(inputField?.Email) && !validEmail(inputField.Email)) {
+      toast.error('Invalid email');
+      return;
+    }
+
     try {
       const customer = {
         CustomerId: user._id,
         Name: inputField.Name,
-        Telephone: inputField.Telephone,
+        // Telephone: inputField.Telephone,
         Number: inputField.Number,
         Street: inputField.Street,
         District: inputField.District,
         City: inputField.City,
         Gender: inputField.Gender,
+        Email: inputField.Email,
       };
       try {
         const response = await axios.put(
@@ -97,14 +104,19 @@ export default function Information() {
           customer
         );
         const record = response.data;
-        setUser(record.value);
-
         if (record.status === 200) {
+          setUser(record.value);
           toast.success(record.message);
         } else {
           toast.error(record.message);
         }
       } catch (err) {
+        const messageError = e?.response?.data?.error;
+        if (!isEmpty(messageError)) {
+          toast.error(messageError);
+          return;
+        }
+
         toast.error("Somethings went wrong");
       }
     } catch (err) {
@@ -157,6 +169,8 @@ export default function Information() {
             <input
               className="input-container"
               type="text"
+              readOnly
+              disabled={true}
               autoComplete="off"
               value={inputField.Telephone}
               name="Telephone"
@@ -166,7 +180,6 @@ export default function Information() {
           <div className="item-information">
             <span>Email</span>
             <input
-              readOnly
               className="input-container"
               type="text"
               autoComplete="off"

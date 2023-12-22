@@ -125,7 +125,7 @@ export default function Services() {
                   image={item?.Image}
                   name={item?.Name_Service}
                   description={item?.Description}
-                  price={item?.Price}
+                  price={item?.Price}VND
                 />
           
             </div>

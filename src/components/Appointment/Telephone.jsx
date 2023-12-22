@@ -82,32 +82,5 @@ export default function Telephone() {
     }
   };
 
-  return (
-    <div className="Telephone">
-      <div className="header-tel"> Make a appointment</div>
-      <span className="content-tel">
-        After cutting the payment, it's okay to cancel the schedule
-      </span>
-      <div className="item-tel">
-        <input
-          type="number"
-          placeholder="Telephone"
-          className="input-tel"
-          name="Telephone"
-          value={inputField.Telephone}
-          onChange={InputHandler}
-        />
-        <button
-          type="submit"
-          style={{ cursor: "pointer" }}
-          onClick={submitHandle}
-        >
-          Make a appointment
-        </button>
-      </div>
-      {errField.TelephoneErr.length > 0 && (
-        <span className="error">{errField.TelephoneErr} </span>
-      )}
-    </div>
-  );
+  
 }

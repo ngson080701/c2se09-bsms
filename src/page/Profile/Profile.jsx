@@ -12,7 +12,7 @@ import "../../styles/profile.css";
 import "../../styles/components/profile/evaluate.css";
 import axios from "axios";
 import { useState, useEffect, useContext, useMemo } from "react";
-import { AuthContext } from "./../../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 import Scroll from "../../components/ScrollToTop/Scroll";
 import { MdViewHeadline } from "react-icons/md";
 import Rating from "react-rating";

@@ -44,7 +44,7 @@
   font-size: 14px;
 }
 .price-link {
-  padding-bottom: 30px;
+  padding-bottom: 15px;
 }
 .price-link .price {
   background-color: var(--color-button);
@@ -54,7 +54,7 @@
   font-family: var(--family-header);
   font-size: 18px;
   border: 1px solid var(--color-button);
-  padding: 20px;
+  padding: 10px;
   margin-right: 10px;
   transition: all 0.3s ease-in-out;
 }

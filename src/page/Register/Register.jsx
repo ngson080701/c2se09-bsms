@@ -12,6 +12,7 @@ import { useNavigate } from "react-router";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ReCAPTCHA from "react-google-recaptcha";
+import {isEmpty, validEmail, validPhoneNumber} from "../../utils";
 
 const SITE_KEY = "6Lc7fhAjAAAAAGx42AoXHeM-zx_wONWme7aRc0xn";
 
@@ -75,6 +76,41 @@ export default function Register() {
   // handle Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isEmpty(inputField?.Name_Customer)) {
+      toast.error('Required customer name');
+      return;
+    }
+
+    if (isEmpty(inputField?.Telephone) || !validPhoneNumber(inputField?.Telephone)) {
+      toast.error('Invalid Telephone');
+      return;
+    }
+
+    if (!isEmpty(inputField?.Email) && !validEmail(inputField?.Email)) {
+      toast.error('Invalid Email');
+      return;
+    }
+
+    if (isEmpty(inputField?.Password)) {
+      toast.error('Required Password');
+      return;
+    }
+
+    if (isEmpty(inputField?.Confirm)) {
+      toast.error('Required Password Confirm');
+      return;
+    }
+
+    if (inputField?.Confirm.length < 6) {
+      toast.error('Required password length is greater than 6 characters');
+    }
+
+    if (inputField?.Password !== inputField?.Confirm) {
+      toast.error('Password and password confirm invalid');
+      return;
+    }
+
+
     const customer = {
       Name_Customer: inputField.Name_Customer,
       Telephone: inputField.Telephone,
@@ -82,6 +118,7 @@ export default function Register() {
       Password: inputField.Password,
       token: recaptchaValue,
     };
+
     try {
       const response = await axios.post(
         "http://localhost:8800/api/auth/register",
@@ -89,20 +126,27 @@ export default function Register() {
       );
 
       if (response.data.status === 300) {
-        toast.error(response.data.message);
+        await toast.error(response.data.message);
       } else {
-        toast.success(response.data.message);
-        setTimeout(() => {
-          history("/login");
-        }, 3000);
+        await toast.success(response.data.message);
+        localStorage.setItem('username', inputField.Telephone);
+        history("/register-otp");
       }
     } catch (err) {
+      const messageError = err?.response?.data?.error;
+      if (!isEmpty(messageError)) {
+        toast.error(messageError);
+        return;
+      }
+
       toast.error("Form Invalid!");
     }
     // if (validateForm()) {
-     
+
     // }
   };
+
+
   const validateForm = () => {
     let formValid = true;
     setInputField({
@@ -122,38 +166,29 @@ export default function Register() {
     }
 
     const validPass = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
-    const validEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    const checkTelephone = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
-    if (inputField.Email === "") {
+
+    if (!isEmpty(inputField.Email) && !validEmail(inputField?.Email)) {
       formValid = false;
       setErrField((prevState) => ({
         ...prevState,
-        EmailErr: "Please enter email",
+        EmailErr: "You have entered an invalid email address! ",
       }));
-    } else {
-      if (!inputField.Email.match(validEmail)) {
-        formValid = false;
-        setErrField((prevState) => ({
-          ...prevState,
-          EmailErr: "You have entered an invalid email address! ",
-        }));
-      }
     }
 
-    if (inputField.Telephone === "") {
+    if (isEmpty(inputField.Telephone)) {
       formValid = false;
       setErrField((prevState) => ({
         ...prevState,
         TelephoneErr: "Please enter telephone",
       }));
-    } else {
-      if (!inputField.Telephone.match(checkTelephone)) {
-        formValid = false;
-        setErrField((prevState) => ({
-          ...prevState,
-          TelephoneErr: "You have entered an invalid telephone !",
-        }));
-      }
+    }
+
+    if (!isEmpty(inputField.Telephone) && !validPhoneNumber(inputField.Telephone)) {
+      formValid = false;
+      setErrField((prevState) => ({
+        ...prevState,
+        TelephoneErr: "You have entered an invalid telephone !",
+      }));
     }
 
     if (inputField.Password === "") {

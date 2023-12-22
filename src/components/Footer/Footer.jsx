@@ -100,8 +100,8 @@ export default function Footer() {
       </div> */}
       <div className="last">
         <span>
-          Copyright ©2022 All rights reserved | This template is made with{" "}
-          <AiFillHeart /> by KhanhBatLuc
+          Copyright @2023| This template is made with{" "}
+          <AiFillHeart /> by C2SE09
         </span>
       </div>
     </div>

@@ -24,7 +24,7 @@ export default function Pricing() {
             <p>{value.Description}</p>
             <div className="price-link">
               <span className="price"> {value.Price}$</span>
-              <Link to={``} className="link">
+              <Link to={`/services/${value.Name_Service}`} className="link">
                 <span> See Detail</span>
               </Link>
             </div>

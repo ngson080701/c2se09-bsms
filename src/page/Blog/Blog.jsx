@@ -12,6 +12,7 @@ import Scroll from "../../components/ScrollToTop/Scroll";
 export default function Blog() {
   const [data, setData] = useState([]);
   const [services, setServices] = useState([]);
+  const [category, setCategory] = useState([]);
   const [limit, setLimit] = useState([]);
 
   useEffect(() => {
@@ -28,6 +29,14 @@ export default function Blog() {
       setServices(res.data.value);
     };
     fetchService();
+  }, []);
+
+  useEffect(() => {
+    const fetcCategory = async () => {
+      const res = await axios.get("http://localhost:8800/api/category/all");
+      setCategory(res.data.value);
+    };
+    fetcCategory();
   }, []);
 
   useEffect(() => {
@@ -82,10 +91,10 @@ export default function Blog() {
           </div>
           {/* list service */}
           <div className="list-service-blog">
-            <h3 className="title-blog"> Services</h3>
-            {services.map((value) => (
+            <h3 className="title-blog"> CATEGORIES</h3> 
+            {category.map((value) => (
               <div className="service-blog">
-                <span>{value.Name_Service}</span>
+                <span>{value.Title}</span>
               </div>
             ))}
           </div>

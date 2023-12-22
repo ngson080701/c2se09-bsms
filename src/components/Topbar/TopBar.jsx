@@ -4,6 +4,7 @@ import { NavLink, Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { MdAccountCircle, MdLogout } from "react-icons/md";
 import { useNavigate } from "react-router";
+import {isEmpty} from "../../utils";
 
 export default function TopBar() {
   const { user: currentUser } = useContext(AuthContext);
@@ -11,6 +12,9 @@ export default function TopBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [navbar, setNavbar] = useState(false);
 
+  const verifiedOtp = localStorage.getItem('is_verified_otp');
+  const isVerifiedOtp = !isEmpty(verifiedOtp) && verifiedOtp === 'true';
+  const isLogin = isVerifiedOtp && user;
   const changeBackground = () => {
     if (window.scrollY >= 40) {
       setNavbar(true);
@@ -24,6 +28,7 @@ export default function TopBar() {
   // Log out button
   const LogoutHandle = () => {
     window.sessionStorage.clear();
+    window.localStorage.clear();
     window.location.reload();
     history("/login");
   };
@@ -34,16 +39,16 @@ export default function TopBar() {
         <div className="left-topBar">
           <div className="mail">
             <span className="mailus">Phone:</span>
-            <label className="label-topBar"> 0786963376</label>
+            <label className="label-topBar"> 09999999998</label>
             <span className="mailus"> or email us: </span>
-            <label className="label-topBar"> bookingbarber.ad@gmail.com</label>
+            <label className="label-topBar"> c2se09@gmail.com</label>
           </div>
         </div>
         <div className="right-topBar"></div>
       </div>
       <div className="bottom-topBar">
         <div className="logo">
-          <h5 className="logo">BARBERJT</h5>
+          <h5 className="logo">BARBER SHOP</h5>
         </div>
         <div className={`navigation-menu ${isOpen && "open"}`}>
           <div className="items-link">
@@ -71,15 +76,20 @@ export default function TopBar() {
               Blog
             </NavLink>
           </div>
-          <div className="items-link">
-            <NavLink className="link" to="/contact">
-              Contact
-            </NavLink>
-          </div>
+          
+          {
+            isLogin ? (
+                <div className="items-link">
+                  <NavLink className="link" to={`/appointment/${user.Telephone}`}>
+                    Booking Now
+                  </NavLink>
+                </div>
+            ): ('')
+          }
         </div>
         <div className="login-topBar">
           <span> </span>
-          {user ? (
+          {isLogin ? (
             <div className="items-topBar">
               <div className="top-dropdown">
                 <div className="top-dropdown-select">

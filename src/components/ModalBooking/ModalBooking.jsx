@@ -93,7 +93,7 @@ const ModalBooking = ({
               </div>
               <div className="item-content-span">
                 <span>Price:</span>
-                <strong>{price}</strong>
+                <strong>{price}VND</strong>
               </div>
               <button
                 style={{ marginBottom: 20 }}

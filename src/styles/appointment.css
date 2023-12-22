@@ -114,7 +114,10 @@
 .booking-check .check-button:hover {
   background-color: var(--color-button);
 }
-
+.img-Store {
+  width: 100%;
+  image-rendering: pixelated;
+}
 /* for modal  */
 .overlay {
   background-color: rgb(0, 0, 0, 0.2);

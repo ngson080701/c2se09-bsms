@@ -10,7 +10,7 @@ export default function Category({ image, name, description, price }) {
           <div className="h3"> {name}</div>
           <p>{description}</p>
           <div className="price-link">
-            <span className="price"> {price}$</span>
+            <span className="price"> {price} VND</span>
             <Link to={`/services/${name}`} className="link">
               <span>See Detail</span>
             </Link>
