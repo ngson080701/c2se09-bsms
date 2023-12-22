@@ -7,7 +7,9 @@ import { OAuth2Client } from "google-auth-library";
 import dotenv from "dotenv";
 import axios from "axios";
 import jwt from "jsonwebtoken";
-import { json } from "express";
+import {sendMail} from "../utitls/mail.js";
+import {sendSMS} from "../utitls/sms.js";
+import {convertPhoneNumber, isEmpty, validEmail} from "../utitls/index.js";
 
 // *Useful for getting environment vairables
 dotenv.config();
@@ -17,7 +19,7 @@ dotenv.config();
 export const RegisterForCustomer = async (req, res) => {
   const responseType = {
     status: 200,
-    statusText: "Success",
+    message: "Success",
   };
   const input = req.body;
   console.log(input);
@@ -47,30 +49,51 @@ export const RegisterForCustomer = async (req, res) => {
   */
 
   try {
-    const user = await Customer.findOne({ Email: input.Email });
-
-    if (user) {
-      responseType.status = 300;
-      responseType.message = "Email is already registered!";
-      return res.json(responseType);
-    } else {
-      const salt = bcryptjs.genSaltSync(10);
-      const hashPassword = bcryptjs.hashSync(input.Password, salt);
-
-      const newCustomer = new Customer({
-        Name_Customer: input.Name_Customer,
-        Telephone: input.Telephone,
-        Email: input.Email,
-        Password: hashPassword,
-      });
-
-      // Save the new customer to the database
-      const saveCustomer = await newCustomer.save();
-      responseType.message = "Register Successfully";
-      responseType.value = saveCustomer;
-
-      return res.json(responseType);
+    if (!isEmpty(input.Email)) {
+      const checkEmail = await Customer.findOne({ Email: input.Email });
+      if (!isEmpty(checkEmail)) {
+        responseType.status = 300;
+        responseType.message = "Email is already registered!";
+        return res.json(responseType);
+      }
     }
+
+    if (!isEmpty(input.Telephone)) {
+      const checkTelephone = await Customer.findOne({ Telephone: input.Telephone });
+      if (!isEmpty(checkTelephone)) {
+        responseType.status = 300;
+        responseType.message = "Telephone is already registered!";
+        return res.json(responseType);
+      }
+    }
+
+    const salt = bcryptjs.genSaltSync(10);
+    const hashPassword = bcryptjs.hashSync(input.Password, salt);
+
+    const newCustomer = new Customer({
+      Name_Customer: input.Name_Customer,
+      Telephone: input.Telephone,
+      Email: input.Email,
+      Password: hashPassword,
+    });
+
+    // Save the new customer to the database
+    const saveCustomer = await newCustomer.save();
+    responseType.message = "Register Successfully";
+    responseType.value = saveCustomer;
+
+    let otpcode = Math.floor(Math.random() * 100000 + 1);
+    let otpData = new OTP({
+      email: input.Telephone,
+      code: otpcode,
+      expireIn: new Date().getTime() + 300 * 1000,
+      isVerified: false,
+      type: 'register',
+    });
+    let otpResponse = await otpData.save();
+    sendSMS(convertPhoneNumber(input.Telephone), `Verify register OTP :${otpcode}`);
+
+    return res.json(responseType);
   } catch (error) {
     console.log(error);
     responseType.message = "An error occurred during registration";
@@ -92,12 +115,12 @@ export const LoginForCustomer = async (req, res) => {
     const response = await axios.post(googleVerifyUrl);
     const { success } = response.data;
     if (success) {
-      const user = await Customer.findOne({
-        Email: req.body.Email,
-      });
-      if (!user) {
+      const user = await Customer.findOne({Telephone: req.body.Email}).exec();
+      if (isEmpty(user)) {
         responseType.status = 300;
-        responseType.message = "Email was wrong!";
+        responseType.message = "Account was wrong!";
+        res.json(responseType);
+        return;
       }
 
       try {
@@ -105,15 +128,52 @@ export const LoginForCustomer = async (req, res) => {
         if (!match) {
           responseType.status = 301;
           responseType.message = "Password not match!";
+          res.json(responseType);
+          return;
         } else {
+
+          let otpcode = Math.floor(Math.random() * 100000 + 1);
+
+          if (!user?.IsVerified) {
+            let otpData = new OTP({
+              email: req.body.Email,
+              code: otpcode,
+              expireIn: new Date().getTime() + 300 * 1000,
+              isVerified: false,
+              type: 'register',
+            });
+            let otpResponse = await otpData.save();
+            sendSMS(convertPhoneNumber(req.body.Email), `Verify register OTP :${otpcode}`);
+
+            responseType.status = 200;
+            responseType.message = "Verify register OTP";
+            responseType.value = user;
+            res.json(responseType);
+            return;
+          }
+
+          let otpData = new OTP({
+            email: req.body.Email,
+            code: otpcode,
+            expireIn: new Date().getTime() + 300 * 1000,
+            isVerified: false,
+            type: 'login',
+          });
+          let otpResponse = await otpData.save();
+          sendSMS(convertPhoneNumber(req.body.Email), `Verify login OTP :${otpcode}`);
+
+
           responseType.status = 200;
           responseType.message = "Login Successfully";
           responseType.value = user;
+          res.json(responseType);
+          return;
         }
       } catch (err) {
         console.log(err);
       }
     } else {
+      responseType.status = 400;
       responseType.message = "reCaptcha is invalid";
     }
   } catch (error) {
@@ -245,7 +305,7 @@ export const SendEmail = async (req, res) => {
       to: req.body.Email, // Gửi đến ai?
       subject: "OTP  FOR CHANGE PASSWORD", // Tiêu đề email
       html: `
-        Confirm your OTP to change your password : 
+        Confirm your OTP to change your password :
       <h3>${otpcode}</h3>`, // Nội dung email
     };
     await transport.sendMail(mailOptions);
@@ -262,6 +322,68 @@ export const SendEmail = async (req, res) => {
   // return responseType to front-end check error
   res.json(responseType);
 };
+
+export const sendVerifyOTP = async (req, res) => {
+  const otp = await OTP.findOne({
+    email: req.body.Email,
+    code: req.body.Otp,
+    expireIn: { $gte: new Date().getTime() },
+    isVerified: false,
+    type: 'login'
+  }).exec();
+  const responseType = {};
+  if (!otp) {
+    responseType.message = "The OTP code has expired or is incorrect";
+    responseType.status = 500;
+    res.json(responseType);
+    return;
+  }
+
+  otp.isVerified = true;
+  await otp.save();
+
+  responseType.message = "Success";
+  responseType.status = 200;
+  res.json(responseType);
+}
+
+export const verifyRegisterOTP = async (req, res) => {
+  const otp = await OTP.findOne({
+    email: req.body.Email,
+    code: req.body.Otp,
+    expireIn: { $gte: new Date().getTime() },
+    isVerified: false,
+    type: 'register'
+  }).exec();
+  const responseType = {};
+  if (!otp) {
+    responseType.message = "The OTP code has expired or is incorrect";
+    responseType.status = 500;
+    res.json(responseType);
+    return;
+  }
+
+
+  const customer = await Customer.findOne({
+    Telephone: req.body.Email
+  }).exec();
+  if (!customer) {
+    responseType.message = "Customer verify not found";
+    responseType.status = 500;
+    res.json(responseType);
+    return;
+  }
+
+  customer.IsVerified = true;
+  await customer.save();
+
+  otp.isVerified = true;
+  await otp.save();
+
+  responseType.message = "Success";
+  responseType.status = 200;
+  res.json(responseType);
+}
 
 // Login for staff
 export const LoginForStaff = async (req, res) => {
@@ -292,7 +414,7 @@ export const LoginForStaff = async (req, res) => {
       );
       console.log(token)
       responseType.token = token;
-    }  
+    }
   } catch (error) {
     console.log("====================================");
     console.log(error);

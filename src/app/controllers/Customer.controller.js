@@ -1,5 +1,6 @@
 import { Customer } from "../models/Customer/Customer.model.js";
 import bcryptjs from "bcryptjs";
+import {isEmpty} from "../utitls/index.js";
 
 // check customer exist with telephone
 
@@ -59,6 +60,17 @@ export const CreateCustomer = async (req, res) => {
 export const UpdateCustomer = async (req, res) => {
   const responseType = {};
   // check input
+
+  if (!isEmpty(req.body.Email)) {
+    const reqCustomer = await Customer.findOne({Email: req.body.Email});
+    if (!isEmpty(reqCustomer) && reqCustomer._id !== req.params.id) {
+      responseType.message = "Email already exists";
+      responseType.status = 404;
+
+      res.json(responseType);
+      return;
+    }
+  }
 
   try {
     const customer = await Customer.findByIdAndUpdate(

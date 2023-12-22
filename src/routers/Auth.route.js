@@ -9,7 +9,7 @@ import {
   SendEmailStaff,
   ChangePasswordStaff,
   changePasswordWithOldPassword,
-  ChangePasswordWithOldPasswordForStaff,
+  ChangePasswordWithOldPasswordForStaff, sendVerifyOTP, verifyRegisterOTP,
 } from "../app/controllers/Auth.controller.js";
 
 // Sign up for customer don't have account
@@ -23,6 +23,9 @@ router.post("/resetPassword/:id", changePasswordWithOldPassword);
 
 //Send email for customer
 router.post("/send-email", SendEmail);
+
+router.post('/verify-send-otp', sendVerifyOTP);
+router.post('/register-verify-otp', verifyRegisterOTP);
 //Change password for customer
 router.post("/change-password", ChangePassword);
 
